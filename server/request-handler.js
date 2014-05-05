@@ -7,24 +7,7 @@
 var url = require("url");
 var querystring = require("querystring");
 
-var messages = [
-  {
-    createdAt: "2014-05-05T21:43:55.910Z",
-    objectId: "aOoTWgSMGS",
-    roomname: "box",
-    text: "is?",
-    updatedAt: "2014-05-05T21:43:55.910Z",
-    username: "ramdog"
-  },
-  {
-    createdAt: "2014-05-05T21:25:34.591Z",
-    objectId: "qwbRByrTPI",
-    roomname: "lobby",
-    text: "kkm",
-    updatedAt: "2014-05-05T21:25:34.591Z",
-    username: "mkk"
-  }
-];
+var messages = [];
 
 var addMessage = function(data) {
   var message = JSON.parse(data);
@@ -48,7 +31,6 @@ var handleRequest = function(request, response) {
 
   var pathname = url.parse(request.url).pathname;
 
-
   console.log(url.parse(request.url).query);
 
   /* Without this line, this server wouldn't work. See the note
@@ -57,11 +39,32 @@ var handleRequest = function(request, response) {
 
   if (pathname === "/classes/messages") {
     if (request.method === 'GET') {
+      statusCode = 200;
       headers['Content-Type'] = "application/json";
       response.writeHead(statusCode, headers);
-      response.end(JSON.stringify({results: messages}));
+
+      var results = messages;
+      var data = querystring.parse(url.parse(request.url).query);
+      for (var key in data) {
+        if (key === "order") {
+          var property = data[key];
+          var reverse = false;
+          if (property[0] === "-") {
+            property = property.slice(1);
+            reverse = true;
+          }
+          results.sort(function(a, b) {
+            if (a[property] < b[property]) return reverse ? 1 : -1;
+            else if (a[property] > b[property]) return reverse ? -1 : 1;
+            else return 0;
+          });
+        }
+      }
+
+      response.end(JSON.stringify({results: results}));
     }
     if (request.method === 'POST') {
+      statusCode = 201;
       request.on('data', addMessage);
       headers['Content-Type'] = "text/plain";
       response.writeHead(statusCode, headers);
@@ -72,8 +75,7 @@ var handleRequest = function(request, response) {
       response.end();
     }
   } else {
-    headers['Content-Type'] = "text/plain";
-
+    statusCode = 404;
     /* .writeHead() tells our server what HTTP status code to send back */
     response.writeHead(statusCode, headers);
     
@@ -81,7 +83,7 @@ var handleRequest = function(request, response) {
      * anything back to the client until you do. The string you pass to
      * response.end() will be the body of the response - i.e. what shows
      * up in the browser.*/
-    response.end("Hello, World!");
+    response.end();
   }
 };
 
