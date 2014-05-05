@@ -26,6 +26,15 @@ var messages = [
   }
 ];
 
+var addMessage = function(data) {
+  var message = JSON.parse(data);
+  message.username = message.username || "";
+  message.text = message.text || "";
+  message.roomname = message.roomname || "";
+  message.createdAt = (new Date()).toJSON();
+  messages.push(message);
+};
+  
 var handleRequest = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
   request - such as what URL the browser is requesting. */
@@ -47,13 +56,22 @@ var handleRequest = function(request, response) {
   var headers = defaultCorsHeaders;
 
   if (pathname === "/classes/messages") {
-    headers['Content-Type'] = "application/json";
-    
-    response.writeHead(statusCode, headers);
-
-    response.end(JSON.stringify({results: messages}));
+    if (request.method === 'GET') {
+      headers['Content-Type'] = "application/json";
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify({results: messages}));
+    }
+    if (request.method === 'POST') {
+      request.on('data', addMessage);
+      headers['Content-Type'] = "text/plain";
+      response.writeHead(statusCode, headers);
+      response.end("post successful");
+    } 
+    if (request.method ==='OPTIONS') {
+      response.writeHead(statusCode, headers);
+      response.end();
+    }
   } else {
-
     headers['Content-Type'] = "text/plain";
 
     /* .writeHead() tells our server what HTTP status code to send back */

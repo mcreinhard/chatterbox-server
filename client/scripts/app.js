@@ -16,7 +16,7 @@ var app = {};
   // initializes this app in index.html
   app.init = function() {
     app.fetch();
-    // setInterval(app.fetch, 1000);
+    setInterval(app.fetch, 5000);
     app.username = parseQueryString(window.location.search).username;
     app.roomname = undefined; // start off in a nameless room
     app.friends = {}; // {"friend name": true}
