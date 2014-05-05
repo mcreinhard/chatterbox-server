@@ -4,6 +4,27 @@
  * You'll have to figure out a way to export this function from
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
+var url = require("url");
+var querystring = require("querystring");
+
+var messages = [
+  {
+    createdAt: "2014-05-05T21:43:55.910Z",
+    objectId: "aOoTWgSMGS",
+    roomname: "box",
+    text: "is?",
+    updatedAt: "2014-05-05T21:43:55.910Z",
+    username: "ramdog"
+  },
+  {
+    createdAt: "2014-05-05T21:25:34.591Z",
+    objectId: "qwbRByrTPI",
+    roomname: "lobby",
+    text: "kkm",
+    updatedAt: "2014-05-05T21:25:34.591Z",
+    username: "mkk"
+  }
+];
 
 var handleRequest = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
@@ -16,20 +37,34 @@ var handleRequest = function(request, response) {
 
   var statusCode = 200;
 
+  var pathname = url.parse(request.url).pathname;
+
+
+  console.log(url.parse(request.url).query);
+
   /* Without this line, this server wouldn't work. See the note
    * below about CORS. */
   var headers = defaultCorsHeaders;
 
-  headers['Content-Type'] = "text/plain";
+  if (pathname === "/classes/messages") {
+    headers['Content-Type'] = "application/json";
+    
+    response.writeHead(statusCode, headers);
 
-  /* .writeHead() tells our server what HTTP status code to send back */
-  response.writeHead(statusCode, headers);
+    response.end(JSON.stringify({results: messages}));
+  } else {
 
-  /* Make sure to always call response.end() - Node will not send
-   * anything back to the client until you do. The string you pass to
-   * response.end() will be the body of the response - i.e. what shows
-   * up in the browser.*/
-  response.end("Hello, World!");
+    headers['Content-Type'] = "text/plain";
+
+    /* .writeHead() tells our server what HTTP status code to send back */
+    response.writeHead(statusCode, headers);
+    
+    /* Make sure to always call response.end() - Node will not send
+     * anything back to the client until you do. The string you pass to
+     * response.end() will be the body of the response - i.e. what shows
+     * up in the browser.*/
+    response.end("Hello, World!");
+  }
 };
 
 /* These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -43,3 +78,5 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
+
+module.exports = handleRequest;
