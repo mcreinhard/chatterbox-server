@@ -16,7 +16,7 @@ var app = {};
   // initializes this app in index.html
   app.init = function() {
     app.fetch();
-    setInterval(app.fetch, 5000);
+    setInterval(app.fetch, 1000);
     app.username = parseQueryString(window.location.search).username;
     app.roomname = undefined; // start off in a nameless room
     app.friends = {}; // {"friend name": true}
@@ -82,7 +82,7 @@ var app = {};
   // posts provided message ({username, text, roomname})
   app.send = function(message) {
     $.ajax({
-      url: app.server,
+      url: app.server + (app.roomname || "messages"),
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',
@@ -100,13 +100,10 @@ var app = {};
   app.fetch = function() {
     if (!app.fetch.inProgress) { // guard in case last fetch unresolved
       app.fetch.inProgress = true;
-      $.ajax(app.server, {
+      $.ajax(app.server + (app.roomname || "messages"), {
         type: 'GET',
         data: {
-          order: "-createdAt",
-          where: {
-            roomname: app.roomname
-          }
+          order: "-createdAt"
         },
         contentType: 'application/json',
         success: function (data) {
@@ -133,7 +130,6 @@ var app = {};
     var message = {
       username: app.username,
       text: $input.val(),
-      roomname: app.roomname
     };
     app.send(message);
     $input.val('');
@@ -172,5 +168,5 @@ var app = {};
     }
   };
 
-  app.server = 'http://127.0.0.1:3000/classes/messages';
+  app.server = 'http://127.0.0.1:3000/classes/';
 }).call(this);

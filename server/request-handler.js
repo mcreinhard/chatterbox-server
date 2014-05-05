@@ -9,14 +9,6 @@ var querystring = require("querystring");
 
 var messages = [];
 
-var addMessage = function(data) {
-  var message = JSON.parse(data);
-  message.username = message.username || "";
-  message.text = message.text || "";
-  message.roomname = message.roomname || "";
-  message.createdAt = (new Date()).toJSON();
-  messages.push(message);
-};
   
 var handleRequest = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
@@ -29,7 +21,7 @@ var handleRequest = function(request, response) {
 
   var statusCode = 200;
 
-  var pathname = url.parse(request.url).pathname;
+  var pathname = url.parse(request.url).pathname.split("/").slice(1);
 
   console.log(url.parse(request.url).query);
 
@@ -37,13 +29,20 @@ var handleRequest = function(request, response) {
    * below about CORS. */
   var headers = defaultCorsHeaders;
 
-  if (pathname === "/classes/messages") {
+  if (pathname.length === 2 && pathname[0] === "classes") {
     if (request.method === 'GET') {
       statusCode = 200;
       headers['Content-Type'] = "application/json";
       response.writeHead(statusCode, headers);
 
       var results = messages;
+
+      if (pathname[1] !== "messages") {
+        results = results.filter(function(message) {
+          return message.roomname === decodeURIComponent(pathname[1]);
+        });
+      }
+      
       var data = querystring.parse(url.parse(request.url).query);
       for (var key in data) {
         if (key === "order") {
@@ -64,6 +63,15 @@ var handleRequest = function(request, response) {
       response.end(JSON.stringify({results: results}));
     }
     if (request.method === 'POST') {
+      var roomname = (pathname[1] === "messages") ? "" : decodeURIComponent(pathname[1]);
+      var addMessage = function(data) {
+        var message = JSON.parse(data);
+        message.username = message.username || "";
+        message.text = message.text || "";
+        message.roomname = roomname;
+        message.createdAt = (new Date()).toJSON();
+        messages.push(message);
+      };
       statusCode = 201;
       request.on('data', addMessage);
       headers['Content-Type'] = "text/plain";
@@ -71,6 +79,7 @@ var handleRequest = function(request, response) {
       response.end("post successful");
     } 
     if (request.method ==='OPTIONS') {
+      statusCode = 200;
       response.writeHead(statusCode, headers);
       response.end();
     }
