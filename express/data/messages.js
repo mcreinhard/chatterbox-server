@@ -17,6 +17,7 @@
 
   messages.add = function(message) {
     var key, _i, _len, _ref;
+    console.log(message);
     _ref = ['username', 'text', 'roomname'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       key = _ref[_i];
@@ -29,16 +30,32 @@
   };
 
   messages.get = function(options) {
-    var _ref;
-    if ((options != null ? (_ref = options.order) != null ? _ref.length : void 0 : void 0) > 0) {
+    var filter, key, sort, val, _ref;
+    console.log(options);
+    if ((options != null ? options.filter : void 0) != null) {
+      _ref = options.filter, key = _ref[0], val = _ref[1];
+      filter = function(list) {
+        return _(list).filter((function(x) {
+          return x[key] === val;
+        }));
+      };
+    } else {
+      filter = _.identity;
+    }
+    if ((options != null ? options.order : void 0) != null) {
       if (options.order[0] === '-') {
-        return (_(data).sortBy(options.order.slice(1))).reverse();
+        sort = function(list) {
+          return (_(list).sortBy(options.order.slice(1))).reverse();
+        };
       } else {
-        return _(data).sortBy(options.order);
+        sort = function(list) {
+          return _(list).sortBy(options.order);
+        };
       }
     } else {
-      return data;
+      sort = _.identity;
     }
+    return filter(sort(data));
   };
 
   module.exports = messages;
