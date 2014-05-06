@@ -10,24 +10,25 @@ data = [{
 }]
 
 messages.add = (message) ->
-  console.log message
   (message[key] ?= '') for key in ['username', 'text', 'roomname']
   message.createdAt = do (new Date()).toJSON
   data.push message
 
 messages.get = (options) ->
-  console.log options
+  filter = _.identity
+  sort = _.identity
+    
   if options?.filter?
-    [key, val] = options.filter
-    filter = (list) -> _(list).filter ((x) -> x[key] is val)
-  else filter = _.identity
+    [key, val] = [k, v] for k, v of options.filter
+    if key?
+      filter = (list) -> _(list).filter ((x) -> x[key] is val)
     
   if options?.order?
-    if options.order[0] is '-'
-      sort = (list) -> do (_(list).sortBy options.order.slice(1)).reverse
-    else
-      sort = (list) -> _(list).sortBy options.order
-  else sort = _.identity
+    sort = 
+      if options.order[0] is '-'
+        (list) -> do (_(list).sortBy options.order[1..]).reverse
+      else
+        (list) -> _(list).sortBy options.order
 
   filter sort data
 

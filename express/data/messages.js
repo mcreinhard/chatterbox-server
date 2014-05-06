@@ -17,7 +17,6 @@
 
   messages.add = function(message) {
     var key, _i, _len, _ref;
-    console.log(message);
     _ref = ['username', 'text', 'roomname'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       key = _ref[_i];
@@ -30,30 +29,29 @@
   };
 
   messages.get = function(options) {
-    var filter, key, sort, val, _ref;
-    console.log(options);
+    var filter, k, key, sort, v, val, _ref, _ref1;
+    filter = _.identity;
+    sort = _.identity;
     if ((options != null ? options.filter : void 0) != null) {
-      _ref = options.filter, key = _ref[0], val = _ref[1];
-      filter = function(list) {
-        return _(list).filter((function(x) {
-          return x[key] === val;
-        }));
-      };
-    } else {
-      filter = _.identity;
-    }
-    if ((options != null ? options.order : void 0) != null) {
-      if (options.order[0] === '-') {
-        sort = function(list) {
-          return (_(list).sortBy(options.order.slice(1))).reverse();
-        };
-      } else {
-        sort = function(list) {
-          return _(list).sortBy(options.order);
+      _ref = options.filter;
+      for (k in _ref) {
+        v = _ref[k];
+        _ref1 = [k, v], key = _ref1[0], val = _ref1[1];
+      }
+      if (key != null) {
+        filter = function(list) {
+          return _(list).filter((function(x) {
+            return x[key] === val;
+          }));
         };
       }
-    } else {
-      sort = _.identity;
+    }
+    if ((options != null ? options.order : void 0) != null) {
+      sort = options.order[0] === '-' ? function(list) {
+        return (_(list).sortBy(options.order.slice(1))).reverse();
+      } : function(list) {
+        return _(list).sortBy(options.order);
+      };
     }
     return filter(sort(data));
   };

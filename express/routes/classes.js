@@ -14,32 +14,30 @@
     res.set(defaultCorsHeaders);
     return next();
   }).get(function(req, res, next) {
-    console.log(req.query);
     return res.status(200).json({
       results: messages.get(req.query)
     });
   }).post(function(req, res, next) {
-    console.log(req.body);
     messages.add(req.body);
-    return res.status(201);
+    return res.send(201);
   });
 
   router.route('/:roomname').all(function(req, res, next) {
     res.set(defaultCorsHeaders);
     return next();
   }).get(function(req, res, next) {
-    console.log(req.query, req.url, req.param('roomname'));
     return res.status(200).json({
       results: messages.get(_(req.query).extend({
-        filter: ['roomname', req.param('roomname')]
+        filter: {
+          roomname: req.param('roomname')
+        }
       }))
     });
   }).post(function(req, res, next) {
-    console.log(req.body, req.url, req.param('roomname'));
     messages.add(_(req.body).extend({
       roomname: req.param('roomname')
     }));
-    return res.status(201);
+    return res.send(201);
   });
 
   module.exports = router;

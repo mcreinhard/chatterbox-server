@@ -9,29 +9,25 @@ router.route '/messages'
   res.set defaultCorsHeaders
   do next
 .get (req, res, next) ->
-  console.log req.query
   res.status 200
   .json
     results: messages.get req.query
 .post (req, res, next) ->
-  console.log req.body
   messages.add req.body
-  res.status 201
+  res.send 201
 
 router.route '/:roomname'
 .all (req, res, next) ->
   res.set defaultCorsHeaders
   do next
 .get (req, res, next) ->
-  console.log req.query, req.url, req.param 'roomname'
   res.status 200
   .json
     results: messages.get _(req.query).extend
-      filter: ['roomname', req.param 'roomname']
+      filter: {roomname: req.param 'roomname'}
 .post (req, res, next) ->
-  console.log req.body, req.url, req.param 'roomname'
   messages.add _(req.body).extend roomname: req.param 'roomname'
-  res.status 201
+  res.send 201
 
 module.exports = router
 
