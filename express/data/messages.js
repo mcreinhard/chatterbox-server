@@ -6,14 +6,7 @@
 
   messages = {};
 
-  data = [
-    {
-      username: 'me',
-      text: 'foo',
-      roomname: 'room',
-      createdAt: '2014-05-06T18:55:59.131Z'
-    }
-  ];
+  data = [];
 
   messages.add = function(message) {
     var key, _i, _len, _ref;

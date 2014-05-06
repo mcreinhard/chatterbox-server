@@ -2,18 +2,17 @@ _ = require 'underscore'
 
 messages = {}
 
-data = [{
-  username: 'me'
-  text: 'foo'
-  roomname: 'room'
-  createdAt: '2014-05-06T18:55:59.131Z'
-}]
+data = []
 
 messages.add = (message) ->
   (message[key] ?= '') for key in ['username', 'text', 'roomname']
   message.createdAt = do (new Date()).toJSON
   data.push message
 
+# Possible options:
+#   order: 'property'          sorts by property
+#   order: '-property'         sorts by property in decreasing order
+#   filter: {property: value}  returns only messages with message[property] === value
 messages.get = (options) ->
   filter = _.identity
   sort = _.identity

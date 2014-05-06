@@ -10,10 +10,12 @@
 
   router = express.Router();
 
-  router.route('/messages').all(function(req, res, next) {
+  router.all('/*', function(req, res, next) {
     res.set(defaultCorsHeaders);
     return next();
-  }).get(function(req, res, next) {
+  });
+
+  router.route('/messages').get(function(req, res, next) {
     return res.status(200).json({
       results: messages.get(req.query)
     });
@@ -22,10 +24,7 @@
     return res.send(201);
   });
 
-  router.route('/:roomname').all(function(req, res, next) {
-    res.set(defaultCorsHeaders);
-    return next();
-  }).get(function(req, res, next) {
+  router.route('/:roomname').get(function(req, res, next) {
     return res.status(200).json({
       results: messages.get(_(req.query).extend({
         filter: {
