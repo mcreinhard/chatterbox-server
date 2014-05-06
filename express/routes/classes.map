@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "classes.js",
+  "sourceRoot": "..",
+  "sources": [
+    "routes/classes.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAAA;AAAA,MAAA,eAAA;;AAAA,EAAA,OAAA,GAAU,OAAA,CAAQ,SAAR,CAAV,CAAA;;AAAA,EACA,MAAA,GAAS,OAAO,CAAC,MAAR,CAAA,CADT,CAAA;AAAA"
+}

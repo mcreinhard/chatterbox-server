@@ -16,7 +16,7 @@ var app = {};
   // initializes this app in index.html
   app.init = function() {
     app.fetch();
-    setInterval(app.fetch, 1000);
+    // setInterval(app.fetch, 1000);
     app.username = parseQueryString(window.location.search).username;
     app.roomname = undefined; // start off in a nameless room
     app.friends = {}; // {"friend name": true}
@@ -107,6 +107,7 @@ var app = {};
         },
         contentType: 'application/json',
         success: function (data) {
+          console.log(data);
           app.fetch.inProgress = false;
           $('#chats').empty();
           $('#chats').append('<br>');
@@ -116,6 +117,7 @@ var app = {};
           });
         },
         error: function (data) {
+          console.log(data);
           app.fetch.inProgress = false;
           console.error('chatterbox: Failed to retrieve message');
         }
